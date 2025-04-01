@@ -1,0 +1,43 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  password      String
+  image         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  archives      Archive[]
+}
+
+model Archive {
+  id          String    @id @default(cuid())
+  title       String
+  description String?
+  platform    String    // 예: Twitter, Instagram 등
+  content     Json
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  userId      String
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tags        Tag[]
+
+  @@index([userId])
+}
+
+model Tag {
+  id        String    @id @default(cuid())
+  name      String
+  archives  Archive[]
+  createdAt DateTime  @default(now())
+
+  @@unique([name])
+}
